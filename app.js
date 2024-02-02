@@ -1,20 +1,29 @@
 const scrapProduct = require("./src/scrapProduct");
-// const scrapProductsLinks = require('./scrapProductsLinks')
+const scrapProductsLinks = require("./src/scrapProductsLinks");
+const writeToExcel = require("./src/writeToExcel");
 
 const app = async () => {
-  // const text = 'мобільний телефон'
-  // const productLinks = await scrapProductsLinks(text)
+  const text = "мобільний телефон";
 
-  //   for (var productLink in productLinks) {
-  //     scrapProduct(productLink)
-  //   }
+  const links = await scrapProductsLinks(text);
+  console.log(links);
 
-  const link =
-    "https://rozetka.com.ua/ua/apple-iphone-15-pro-max-256gb-blue-titanium/p395461101/";
+  const productsData = [];
 
-  const productData = await scrapProduct(link);
+  for (var link of links) {
+    const productData = scrapProduct(link);
+    productsData.push((await productData).name);
+  }
 
-  console.log(productData);
+  // const productData = await scrapProduct(link);
+
+  // writeToExcel(productData)
+  //   .then(() => console.log("Дані успішно записано у файл Excel"))
+  //   .catch((error) =>
+  //     console.error("Помилка при записі даних у файл Excel:", error)
+  //   );
+
+  console.log(productsData);
 };
 
 app();
