@@ -1,48 +1,33 @@
-const puppeteer = require('puppeteer-extra')
-const StealthPlugin = require('puppeteer-extra-plugin-stealth')
-puppeteer.use(StealthPlugin())
+const puppeteer = require("puppeteer-extra");
+const StealthPlugin = require("puppeteer-extra-plugin-stealth");
+puppeteer.use(StealthPlugin());
 
-const scrapCharacteristics = async (url) => {
-  const browser = await puppeteer.launch()
-  const page = await browser.newPage()
-  await page.setContent(url + 'characteristics/')
+async function scrapCharacteristics(url) {
+  const browser = await puppeteer.launch({ headless: false });
+  const page = await browser.newPage();
+  await page.goto(url + "/characteristics");
 
-  const characteristics = await page.evaluate(() => {
-    const section = document.querySelector('.characteristics-full__group') // знаходимо секцію з характеристиками
-    const characteristicType = section
-      .querySelector('.characteristics-full__sub-heading')
-      .textContent.trim() // отримуємо тип характеристик
+  const charItem = ".characteristics-full__item";
+  const characteristics = {};
 
-    const characteristicsList = {}
+  const items = await page.$$eval(charItem, (items) => {
+    const charValue = ".characteristics-full__value";
+    const charLabel = ".characteristics-full__label";
 
-    const characteristicItems = section.querySelectorAll(
-      '.characteristics-full__item'
-    )
-    // отримуємо всі елементи характеристик
+    return items.map((item) => {
+      const label = item.querySelector(charLabel).textContent.trim();
+      const value = item.querySelector(charValue).textContent.trim();
 
-    characteristicItems.forEach((item) => {
-      const label = item
-        .querySelector('.characteristics-full__label span')
-        .textContent.trim() // отримуємо назву характеристики
-      const valueElement = item.querySelector(
-        '.characteristics-full__value a, .characteristics-full__value span'
-      ) // знаходимо елемент значення характеристики
-      const value = valueElement ? valueElement.textContent.trim() : null // отримуємо значення характеристики
+      return { label, value };
+    });
+  });
 
-      if (label && value) {
-        characteristicsList[label] = value // додаємо характеристику до списку характеристик
-      }
-    })
+  items.forEach((item) => {
+    characteristics[item.label] = item.value;
+  });
 
-    return {
-      Characteristic_type: characteristicType,
-      characteristics: characteristicsList,
-    }
-  })
-
-  console.log(characteristics) // виводимо характеристики у консоль
-
-  await browser.close()
+  await browser.close();
+  return characteristics;
 }
 
-module.exports = scrapCharacteristics
+module.exports = scrapCharacteristics;

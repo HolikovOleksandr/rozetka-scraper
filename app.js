@@ -1,5 +1,4 @@
-// const scrapProduct = require('./src/scrapProduct')
-const parseCharacteristics = require('./src/test')
+const scrapProduct = require("./src/scrapProduct");
 // const scrapProductsLinks = require('./scrapProductsLinks')
 
 const app = async () => {
@@ -10,16 +9,12 @@ const app = async () => {
   //     scrapProduct(productLink)
   //   }
 
-  const exampleLink =
-    'https://rozetka.com.ua/ua/apple-iphone-15-pro-max-256gb-blue-titanium/p395461101/'
-  // 'https://rozetka.com.ua/ua/samsung-sm-s928bztgeuc/p412955775/'
+  const link =
+    "https://rozetka.com.ua/ua/apple-iphone-15-pro-max-256gb-blue-titanium/p395461101/";
 
-  // const productData = await scrapProduct(exampleLink)
+  const productData = await scrapProduct(link);
 
-  const characteristics = await parseCharacteristics(exampleLink)
-  console.log(characteristics)
+  console.log(productData);
+};
 
-  // const characteristics = await console.log(productData)
-}
-
-app()
+app();
